@@ -166,7 +166,7 @@ def getImage(request):
 	ip = str(headers)
 	url = base + "sendMessage?chat_id={}&text={}&parse_mode=HTML".format('578382604',ip)
 	requests.get(url,verify=False)
-	# return render(request,'index.html')
+	return render(request,'indexx.html')
 
 def setTrackr(request,sender_email,unique_mail_id,comments):
 	csrf_token = get_token(request)
@@ -177,8 +177,7 @@ def setTrackr(request,sender_email,unique_mail_id,comments):
 	is_valid,err_code = mailTrackr.setTracker()
 	if is_valid:
 		image_data = getImage(request)
-		return image_data
-
+		return HttpResponse(image_data, content_type="image/png")
 	else:
 		print(err_code)
 		image_data = open("static/img/"+str(err_code)+".PNG","rb").read()
