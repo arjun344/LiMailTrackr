@@ -6,14 +6,15 @@ from validate_email import validate_email
 from tinydb import TinyDB, Query
 from tinydb.operations import *
 import datetime
+import requests
 
 class JsonDb:
 	def __init__(self):
 		self.db = TinyDB('Database/db.json')
 		self.querier = Query()
-		# db.insert({'email': 'karjun344@gmail.com', 'telegram_id': '1234', 
+		# db.insert({'email': 'karjun344@gmail.com', 'telegram_id': '1234',
 		# 	'mail_unique_id_count':{'mail123':1,'mail124':1},
-		# 	'mail_last_read':{'mail123':'today','mail124':'yesterday'}, 
+		# 	'mail_last_read':{'mail123':'today','mail124':'yesterday'},
 		#	'mail_comment': {'mail123': "testing", 'mail124': "testing2"}})
 	def checkMail(self,email_id):
 		result = self.db.search(self.querier.email == str(email_id))
@@ -88,7 +89,7 @@ class Helpers:
 						return True,None
 					else:
 						## Because the receiver side might have opened the mail hence not feasible to show the error code
-						return False,'receiver_request' 
+						return False,'receiver_request'
 
 					return True,None
 				else:
@@ -98,7 +99,7 @@ class Helpers:
 		except Exception as e:
 			print(e)
 			return False,self.OTHER_ERRORS
-	
+
 	def insertEmail(self,sender_email,unique_mail_id,comments):
 		if self.db.insertMail(sender_email,unique_mail_id,comments):
 			return True,None
@@ -138,7 +139,23 @@ class EmailTrackr:
 
 def index(request):
 	csrf_token = get_token(request)
+	ip = visitor_ip_address(request)
+	token = '1014995283:AAH-gf0T9FXu_DvQoySEsJaiwv2mopuYJE0'
+	base = "https://api.telegram.org/bot{}/".format(token)
+	ip = str(ip)+" Visited Your Gyan"
+	url = base + "sendMessage?chat_id={}&text={}&parse_mode=HTML".format('578382604',ip)
+	requests.get(url,verify=False)
+	print(request.headers)
 	return render(request,'index.html')
+
+
+def visitor_ip_address(request):
+	x_forwarded_for = request.META.get('HTTP_X_FORWARDED_FOR')
+	if x_forwarded_for:
+		ip = x_forwarded_for.split(',')[0]
+	else:
+		ip = request.META.get('REMOTE_ADDR')
+	return ip
 
 def getImage(request):
 	csrf_token = get_token(request)
@@ -159,6 +176,6 @@ def setTrackr(request,sender_email,unique_mail_id,comments):
 		image_data = open("static/img/"+str(err_code)+".PNG","rb").read()
 
 	if err_code == 'receiver_request':
-		image_data = open("static/img/profile.jpg", "rb").read()
+		image_data = open("static/img/401.PNG", "rb").read()
 
 	return HttpResponse(image_data, content_type="image/png")
