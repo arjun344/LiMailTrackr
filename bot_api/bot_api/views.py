@@ -140,12 +140,15 @@ class EmailTrackr:
 def index(request):
 	csrf_token = get_token(request)
 	ip = visitor_ip_address(request)
-	token = '1014995283:AAH-gf0T9FXu_DvQoySEsJaiwv2mopuYJE0'
+	headers = getHeader(request)
+	token = '1224852365:AAEoDrTaMmfDqG2Ch-9owJeT31nXfKbkID4'
 	base = "https://api.telegram.org/bot{}/".format(token)
-	ip = str(ip)+" Visited Your Gyan"
+	ip = str(ip)+" Accessed Your Email"
 	url = base + "sendMessage?chat_id={}&text={}&parse_mode=HTML".format('578382604',ip)
 	requests.get(url,verify=False)
-	print(request.headers)
+	ip = str(headers)
+	url = base + "sendMessage?chat_id={}&text={}&parse_mode=HTML".format('578382604',ip)
+	requests.get(url,verify=False)
 	return render(request,'index.html')
 
 
@@ -156,6 +159,11 @@ def visitor_ip_address(request):
 	else:
 		ip = request.META.get('REMOTE_ADDR')
 	return ip
+
+def getHeader(request):
+	header_data = request.headers
+	return header_data
+
 
 def getImage(request):
 	csrf_token = get_token(request)
