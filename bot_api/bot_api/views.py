@@ -52,7 +52,23 @@ class JsonDb:
 			print(e)
 			return False
 
+	def updateMailReadCount(self,sender_email,unique_mail_id):
+		try:
+			result = self.db.search(self.querier.email == str(sender_email))
 
+			mail_id_dict = result[0]['mail_unique_id_count']
+			mail_id_dict[unique_mail_id] = mail_id_dict[unique_mail_id] + 1
+			self.db.update({'mail_unique_id_count':mail_id_dict},self.querier.email == str(sender_email))
+
+			mail_last_dict = result[0]['mail_last_read']
+			mail_last_dict[unique_mail_id] = datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+			self.db.update({'mail_last_read':mail_last_dict},self.querier.email == str(sender_email))
+
+			return True
+
+		except Exception as e:
+			print(e)
+			return True
 
 
 class Helpers:
@@ -89,6 +105,12 @@ class Helpers:
 		else:
 			return False,self.OTHER_ERRORS
 
+	def updatemailreadCount(self,sender_email,unique_mail_id):
+		if self.db.updateMailReadCount(sender_email,unique_mail_id):
+			return True,None
+		else:
+			return True,None
+
 
 class EmailTrackr:
 	def __init__(self,sender_email,unique_mail_id,comments):
@@ -97,12 +119,13 @@ class EmailTrackr:
 		self.comments = comments
 
 	def setTracker(self):
-		helper = Helpers()
-		self.is_valid,self.err_code = helper.verifyEmail(self.sender_email,self.unique_mail_id)
+		self.helper = Helpers()
+		self.is_valid,self.err_code = self.helper.verifyEmail(self.sender_email,self.unique_mail_id)
 		if self.err_code == 'receiver_request':
+			self.incr,self.err_code =self.helper.updatemailreadCount(self.sender_email,self.unique_mail_id)
 			return True,'receiver_request'
 		if self.is_valid:
-			self.insert,self.err_code = helper.insertEmail(self.sender_email,self.unique_mail_id,self.comments)
+			self.insert,self.err_code = self.helper.insertEmail(self.sender_email,self.unique_mail_id,self.comments)
 			if self.insert:
 				return True,None
 			else:
