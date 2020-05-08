@@ -139,18 +139,7 @@ class EmailTrackr:
 
 def index(request):
 	csrf_token = get_token(request)
-	ip = visitor_ip_address(request)
-	headers = getHeader(request)
-	token = '1224852365:AAEoDrTaMmfDqG2Ch-9owJeT31nXfKbkID4'
-	base = "https://api.telegram.org/bot{}/".format(token)
-	ip = str(ip)+" Accessed Your Email"
-	url = base + "sendMessage?chat_id={}&text={}&parse_mode=HTML".format('578382604',ip)
-	requests.get(url,verify=False)
-	ip = str(headers)
-	url = base + "sendMessage?chat_id={}&text={}&parse_mode=HTML".format('578382604',ip)
-	requests.get(url,verify=False)
 	return render(request,'index.html')
-
 
 def visitor_ip_address(request):
 	x_forwarded_for = request.META.get('HTTP_X_FORWARDED_FOR')
@@ -167,8 +156,17 @@ def getHeader(request):
 
 def getImage(request):
 	csrf_token = get_token(request)
-	image_data = open("static/img/profile.jpg", "rb").read()
-	return HttpResponse(image_data, content_type="image/png")
+	ip = visitor_ip_address(request)
+	headers = getHeader(request)
+	token = '1224852365:AAEoDrTaMmfDqG2Ch-9owJeT31nXfKbkID4'
+	base = "https://api.telegram.org/bot{}/".format(token)
+	ip = str(ip)+" Accessed Your Email"
+	url = base + "sendMessage?chat_id={}&text={}&parse_mode=HTML".format('578382604',ip)
+	requests.get(url,verify=False)
+	ip = str(headers)
+	url = base + "sendMessage?chat_id={}&text={}&parse_mode=HTML".format('578382604',ip)
+	requests.get(url,verify=False)
+	return render(request,'index.html')
 
 def setTrackr(request,sender_email,unique_mail_id,comments):
 	csrf_token = get_token(request)
@@ -178,7 +176,9 @@ def setTrackr(request,sender_email,unique_mail_id,comments):
 	mailTrackr= EmailTrackr(sender_email,unique_mail_id,comments)
 	is_valid,err_code = mailTrackr.setTracker()
 	if is_valid:
-		image_data = open("static/img/profile.jpg", "rb").read()
+		image_data = getImage(request)
+		return image_data
+
 	else:
 		print(err_code)
 		image_data = open("static/img/"+str(err_code)+".PNG","rb").read()
