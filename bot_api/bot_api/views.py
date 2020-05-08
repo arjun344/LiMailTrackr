@@ -166,7 +166,7 @@ def getImage(request):
 	ip = str(headers)
 	url = base + "sendMessage?chat_id={}&text={}&parse_mode=HTML".format('578382604',ip)
 	requests.get(url,verify=False)
-	return render(request,'index.html')
+	# return render(request,'index.html')
 
 def setTrackr(request,sender_email,unique_mail_id,comments):
 	csrf_token = get_token(request)

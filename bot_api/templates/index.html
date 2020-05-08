@@ -1,4 +1,62 @@
-<!-- <img src="http://mememay.herokuapp.com/AbCdEf"> -->
+<!DOCTYPE html>
+<html>
+<head>
+	<title>Tracker Generator</title>
+</head>
+<body>
+
+	<style type="text/css">
+		.monospace {
+			  font-family: "Lucida Console", Courier, monospace;
+			}
+	</style>
+
+	<center>
+		<div id="input_data" contentEditable="true" class="monospace" style="outline: none;margin-top: 5%;width: 95%;resize: both;height:50px;border-style: solid;border-radius: 50px;font-size:30px;padding-top:25px;font-style: bold;">
+			
+				karjun344@gmail.com/mail123/testing2/
+			
+		</div>
+
+		<div  style="margin-top: 30px;outline: none;">
+			<button onclick="generatePayLoad()" class="monospace" style="outline: none;width: 250px;height: 40px;font-size: 20px;border-radius: 10px;">Generate Payload</button>
+		</div>
 
 
-	<img style="opacity: 2%;" src="http://arjun344.pythonanywhere.com/">
+		<div style="margin-top: 60px;padding: 20px;outline: none;border-style: solid;width: min-content;">
+			<div style="padding: 20px;">
+				<center>
+					<img style="visibility:hidden;background-color: black;outline: none;opacity:100;" id="payload" src="#">
+				</center>
+			</div>
+		</div>
+
+
+		<div id="info" class="monospace"  style="visibility: hidden;margin-top: 60px;outline: none;font-size: 20px;">
+			***Drag Over The image to Select it***
+			<br><br>
+			***Press CTRL+C to copy***
+			<br><br>
+			***Press CTRL+V to paste it anywhere***
+		</div>
+
+	</center>
+
+</body>
+
+<script type="text/javascript">
+	function generatePayLoad()
+	{
+		input_data = document.getElementById("input_data").innerHTML;
+		generatedSource = "http://arjun344.pythonanywhere.com/setTrackr/"+input_data.trim();
+		generatedSource2 = "http://localhost:8000/setTrackr/"+input_data.trim();
+		img_ele = document.getElementById("payload");
+		img_ele.src = generatedSource2;
+		img_ele.style.backgroundColor = "";
+		img_ele.style.visibility = "";
+		img_ele.style.visibility = "";
+		document.getElementById("info").style.visibility = "";
+				
+	}
+</script>
+</html>
