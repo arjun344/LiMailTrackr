@@ -49,23 +49,6 @@
 
 <script type="text/javascript">
 
-	function getCookies()
-	{
-		var cookieValue = null;
-		var cookies = document.cookie.split(';');
-		if(cookies.length == 2)
-			{
-				cookies = cookies[1].split('=');
-				cookieValue = cookies[1]
-			}
-		else
-		{
-			cookies = cookies[0].split('=');
-			cookieValue = cookies[1]
-		}
-		var csrftoken = cookieValue;
-		return csrftoken;
-	}
 
 	function generatePayLoad()
 	{
@@ -77,7 +60,7 @@
 		}
 		input_data = document.getElementById("input_data").innerHTML;
 		input_data = input_data.split('/');
-		csrftoken = getCookies();
+		csrftoken = '{{csrf_token}}';
 		email = input_data[0];
 		mailid = input_data[1];
 		comments = input_data[2];
@@ -92,7 +75,8 @@
               		input_data = document.getElementById("input_data").innerHTML;
 					generatedSource = host+"/setTrackr/"+input_data.trim();
 					img_ele = document.getElementById("payload");
-					img_ele.src = generatedSource;
+					img_ele.style.backgroundImage = 'url('+generatedSource+')';
+					img_ele.src = "#";
 					img_ele.style.backgroundColor = "";
 					img_ele.style.visibility = "";
 					img_ele.style.visibility = "";

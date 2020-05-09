@@ -8,6 +8,7 @@ from tinydb.operations import *
 import datetime
 import requests
 from django.http import JsonResponse
+import time
 
 class JsonDb:
 	def __init__(self):
@@ -177,7 +178,7 @@ class headerInfo:
 
 def index(request):
 	csrf_token = get_token(request)
-	return render(request,'index.html')
+	return render(request,'index.html',{'csrf_token':str(csrf_token)})
 
 def visitor_ip_address(request):
 	x_forwarded_for = request.META.get('HTTP_X_FORWARDED_FOR')
@@ -217,7 +218,10 @@ def setTrackr(request,sender_email,unique_mail_id,comments):
 
 	if err_code == 'receiver_request':
 		image_data = getImage(request)
-		return HttpResponse(image_data, content_type="image/png")
+		image_data = open("static/img/test.svg","rb").read()
+		response = HttpResponse()
+		response['status_code'] = 200
+		return response
 
 	if is_valid:
 		image_data = getImage(request)
@@ -248,7 +252,7 @@ def setTrackrr(request):
 		mailTrackr= EmailTrackr(sender_email,unique_mail_id,comments,check)
 		is_valid,err_code = mailTrackr.setTracker()
 		if is_valid:
-			image_data = getImage(request)
+			# image_data = getImage(request)
 			if check == "FromSender":
 				return JsonResponse({'validated':'True','errorcode':str(err_code)})
 			else:
