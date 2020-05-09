@@ -20,7 +20,7 @@
 		</div>
 
 		<div  style="margin-top: 30px;outline: none;">
-			<button onclick="executeFunc()" class="monospace" style="outline: none;width: 250px;height: 40px;font-size: 20px;border-radius: 10px;">Generate Payload</button>
+			<button onclick="generatePayLoad()" class="monospace" style="outline: none;width: 250px;height: 40px;font-size: 20px;border-radius: 10px;">Generate Payload</button>
 		</div>
 
 
@@ -45,8 +45,6 @@
 
 </body>
 <script src="https://ajax.googleapis.com/ajax/libs/jquery/2.1.1/jquery.min.js"></script>
-<script src="/static/js/jquery-1.11.3.min.js" type="text/javascript"></script>
-<script src="/static/js/jquery.selectareas.js" type="text/javascript"></script>
 
 
 <script type="text/javascript">
@@ -69,42 +67,55 @@
 		return csrftoken;
 	}
 
-	function executeFunc()
+	function generatePayLoad()
 	{
+		var host = "http://"+location.hostname;
+		if(location.hostname == "localhost")
+		{
+
+			host = host + ":8000";
+		}
 		input_data = document.getElementById("input_data").innerHTML;
 		input_data = input_data.split('/');
 		csrftoken = getCookies();
 		email = input_data[0];
 		mailid = input_data[1];
-		comment = input_data[2];
+		comments = input_data[2];
 		$.ajax({
               method: 'POST',
-              url: 'checkParam',
-              data: {'email_id':email,'mail_id':mailid,'comments':comment,"csrfmiddlewaretoken" : csrftoken},
+              url: 'setTrackrr',
+              data: {'check':'FromSender','emailid':email,'mailid':mailid,'comments':comments,"csrfmiddlewaretoken" : csrftoken},
               success: function (response) {
+              	
+              	if( response['validated']=="True")
+              	{
+              		input_data = document.getElementById("input_data").innerHTML;
+					generatedSource = host+"/setTrackr/"+input_data.trim();
+					img_ele = document.getElementById("payload");
+					img_ele.src = generatedSource;
+					img_ele.style.backgroundColor = "";
+					img_ele.style.visibility = "";
+					img_ele.style.visibility = "";
+					document.getElementById("info").style.visibility = "";
+              	}
+              	else
+              	{
+              		img_ele = document.getElementById("payload");
+					img_ele.src = host+"/static/img/"+response['errorcode']+".PNG";
+					img_ele.style.backgroundColor = "";
+					img_ele.style.visibility = "";
+					img_ele.style.visibility = "";
+					document.getElementById("info").style.visibility = "";
 
-              	alert("Mail Id Is Not Unique");
+              	}
                    
               },
               error: function (response) {
                    
-              		generatePayLoad();
+              		alert("Something Went Wrong");
+
               }
           });
-	}
-
-
-	function generatePayLoad()
-	{
-		input_data = document.getElementById("input_data").innerHTML;
-		generatedSource = "http://arjun344.pythonanywhere.com/setTrackr/"+input_data.trim();
-		generatedSource2 = "http://localhost:8000/setTrackr/"+input_data.trim();
-		img_ele = document.getElementById("payload");
-		img_ele.src = generatedSource;
-		img_ele.style.backgroundColor = "";
-		img_ele.style.visibility = "";
-		img_ele.style.visibility = "";
-		document.getElementById("info").style.visibility = "";
 				
 	}
 </script>

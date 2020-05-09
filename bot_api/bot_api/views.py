@@ -81,7 +81,7 @@ class Helpers:
 		self.OTHER_ERRORS = OTHER_ERRORS
 		self.db = JsonDb()
 
-	def verifyEmail(self,sender_email,unique_mail_id):
+	def verifyEmail(self,sender_email,unique_mail_id,check):
 		try:
 			self.is_valid = validate_email(sender_email)
 			if self.is_valid:
@@ -90,7 +90,10 @@ class Helpers:
 						return True,None
 					else:
 						## Because the receiver side might have opened the mail hence not feasible to show the error code
-						return False,'receiver_request'
+						if check == "FromSender":
+							return False,self.MAIL_NOT_UNIQUE_ERROR
+						else:
+							return False,'receiver_request'
 
 					return True,None
 				else:
@@ -115,11 +118,11 @@ class Helpers:
 
 
 class EmailTrackr:
-	def __init__(self,sender_email,unique_mail_id,comments):
+	def __init__(self,sender_email,unique_mail_id,comments,check):
 		self.sender_email = sender_email
 		self.unique_mail_id = unique_mail_id
 		self.comments = comments
-
+		self.check = check
 
 	def checkPar(self):
 		self.helper = Helpers()
@@ -128,7 +131,7 @@ class EmailTrackr:
 
 	def setTracker(self):
 		self.helper = Helpers()
-		self.is_valid,self.err_code = self.helper.verifyEmail(self.sender_email,self.unique_mail_id)
+		self.is_valid,self.err_code = self.helper.verifyEmail(self.sender_email,self.unique_mail_id,self.check)
 		if self.err_code == 'receiver_request':
 			self.incr,self.err_code =self.helper.updatemailreadCount(self.sender_email,self.unique_mail_id)
 			return True,'receiver_request'
@@ -188,20 +191,6 @@ def getHeader(request):
 	header_data = request.headers
 	return header_data
 
-
-def checkParam(request):
-	csrf_token = get_token(request)
-	if request.is_ajax():
-		request_data = request.POST
-		print(request_data);
-		sender_email = request_data['email_id'].lower().strip()
-		unique_mail_id = request_data['mail_id'].lower().strip()
-		comments = request_data['comments'].lower().strip()
-		mailTrackr= EmailTrackr(sender_email,unique_mail_id,comments)
-		is_valid,err_code = mailTrackr.setTracker()
-		if err_code == 'receiver_request':
-			return JsonResponse({'something':0})
-
 def getImage(request):
 	csrf_token = get_token(request)
 	ip = visitor_ip_address(request)
@@ -218,19 +207,56 @@ def getImage(request):
 
 def setTrackr(request,sender_email,unique_mail_id,comments):
 	csrf_token = get_token(request)
+	check = "FromReceiver"
+	print("i am here")
 	sender_email = str(sender_email).lower().strip()
 	unique_mail_id = str(unique_mail_id).strip().lower()
 	comments = str(comments).strip().lower()
-	mailTrackr= EmailTrackr(sender_email,unique_mail_id,comments)
+	mailTrackr= EmailTrackr(sender_email,unique_mail_id,comments,check)
 	is_valid,err_code = mailTrackr.setTracker()
-	if is_valid:
-		image_data = getImage(request)
-		return HttpResponse(image_data, content_type="image/png")
-	else:
-		print(err_code)
-		image_data = open("static/img/"+str(err_code)+".PNG","rb").read()
 
 	if err_code == 'receiver_request':
-		image_data = open("static/img/401.PNG", "rb").read()
+		image_data = getImage(request)
+		return HttpResponse(image_data, content_type="image/png")
+
+	if is_valid:
+		image_data = getImage(request)
+		if check == "FromSender":
+			return JsonResponse({'validated':'True','errorcode':str(err_code)})
+		else:
+			return HttpResponse(image_data, content_type="image/png")
+	else:
+		if check == "FromSender":
+			return JsonResponse({'validated':'False','errorcode':str(err_code)})
+		else:
+			image_data = open("static/img/"+str(err_code)+".PNG","rb").read()
+
+	# if err_code == 'receiver_request':
+	# 	image_data = open("static/img/401.PNG", "rb").read()
 
 	return HttpResponse(image_data, content_type="image/png")
+
+def setTrackrr(request):
+	csrf_token = get_token(request)
+	if request.is_ajax():
+		request_data = request.POST
+		check = request_data['check']
+		print("i am here 2")
+		sender_email = request_data['emailid'].lower().strip()
+		unique_mail_id = request_data['mailid'].strip().lower()
+		comments = request_data['comments'].strip().lower()
+		mailTrackr= EmailTrackr(sender_email,unique_mail_id,comments,check)
+		is_valid,err_code = mailTrackr.setTracker()
+		if is_valid:
+			image_data = getImage(request)
+			if check == "FromSender":
+				return JsonResponse({'validated':'True','errorcode':str(err_code)})
+			else:
+				return HttpResponse(image_data, content_type="image/png")
+		else:
+			if check == "FromSender":
+				return JsonResponse({'validated':'False','errorcode':str(err_code)})
+			else:
+				image_data = open("static/img/"+str(err_code)+".PNG","rb").read()
+
+		return HttpResponse(image_data, content_type="image/png")
