@@ -10,6 +10,9 @@ import requests
 from django.http import JsonResponse
 import time
 
+
+timestamp = None
+
 class JsonDb:
 	def __init__(self):
 		self.db = TinyDB('Database/db.json')
@@ -134,8 +137,8 @@ class EmailTrackr:
 		self.helper = Helpers()
 		self.is_valid,self.err_code = self.helper.verifyEmail(self.sender_email,self.unique_mail_id,self.check)
 		if self.err_code == 'receiver_request':
-			self.incr,self.err_code =self.helper.updatemailreadCount(self.sender_email,self.unique_mail_id)
 			return True,'receiver_request'
+
 		if self.is_valid:
 			self.insert,self.err_code = self.helper.insertEmail(self.sender_email,self.unique_mail_id,self.comments)
 			if self.insert:
@@ -173,40 +176,41 @@ class headerInfo:
 				print(e)
 				return False
 
-# class telegramMessage:
-# 	def __init__(self,email_id,mail_id,ip_addr)
+class telegramResponse:
+	def __init__(self,request,email_id,mail_id,comment):
+		self.request = request
+		self.email_id = email_id
+		self.mail_id = mail_id
+		self.comment = comment
+		self.sender = '578382604'
+		self.header = headerInfo(request)
+		self.token = '1224852365:AAEoDrTaMmfDqG2Ch-9owJeT31nXfKbkID4'
+		self.base = "https://api.telegram.org/bot{}/".format(self.token)
+
+	def createReadResponse(self):
+		global timestamp
+		if self.header.verifyGoogleCache():
+
+			self.incr,self.err_code =self.helper.updatemailreadCount(self.email_id,self.mail_id)
+			self.body = "Your Mail \n<b>mailid:"+str(self.mail_id)+" \nremark:"+str(self.comment)+"</b>\nWas Read <b>@ "+str(timestamp)+"</b>"
+
+		else:
+			self.body = "You have been Configured for \n<b>maild_id:"+str(self.mail_id)+"</b> with \n<b>remark:"+str(self.comment)+"</b>"
+		
+		self.url = self.base + "sendMessage?chat_id={}&text={}&parse_mode=HTML".format(self.sender,self.body)
+		requests.get(self.url,verify=False)
 
 def index(request):
 	csrf_token = get_token(request)
 	return render(request,'index.html',{'csrf_token':str(csrf_token)})
 
-def visitor_ip_address(request):
-	x_forwarded_for = request.META.get('HTTP_X_FORWARDED_FOR')
-	if x_forwarded_for:
-		ip = x_forwarded_for.split(',')[0]
-	else:
-		ip = request.META.get('REMOTE_ADDR')
-	return ip
-
-def getHeader(request):
-	header_data = request.headers
-	return header_data
-
 def getImage(request):
 	csrf_token = get_token(request)
-	ip = visitor_ip_address(request)
-	headers = getHeader(request)
-	token = '1224852365:AAEoDrTaMmfDqG2Ch-9owJeT31nXfKbkID4'
-	base = "https://api.telegram.org/bot{}/".format(token)
-	ip = str(ip)+" Accessed Your Email"
-	url = base + "sendMessage?chat_id={}&text={}&parse_mode=HTML".format('578382604',ip)
-	requests.get(url,verify=False)
-	ip = str(headers)
-	url = base + "sendMessage?chat_id={}&text={}&parse_mode=HTML".format('578382604',ip)
-	requests.get(url,verify=False)
 	return render(request,'indexx.html')
 
 def setTrackr(request,sender_email,unique_mail_id,comments):
+	global timestamp
+	timestamp = datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")
 	csrf_token = get_token(request)
 	check = "FromReceiver"
 	print("i am here")
@@ -217,6 +221,10 @@ def setTrackr(request,sender_email,unique_mail_id,comments):
 	is_valid,err_code = mailTrackr.setTracker()
 
 	if err_code == 'receiver_request':
+
+		response = telegramResponse(request,sender_email,unique_mail_id,comments)
+		response.createReadResponse()
+
 		image_data = getImage(request)
 		image_data = open("static/img/test.svg","rb").read()
 		response = HttpResponse()
@@ -234,9 +242,6 @@ def setTrackr(request,sender_email,unique_mail_id,comments):
 			return JsonResponse({'validated':'False','errorcode':str(err_code)})
 		else:
 			image_data = open("static/img/"+str(err_code)+".PNG","rb").read()
-
-	# if err_code == 'receiver_request':
-	# 	image_data = open("static/img/401.PNG", "rb").read()
 
 	return HttpResponse(image_data, content_type="image/png")
 
