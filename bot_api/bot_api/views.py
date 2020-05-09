@@ -7,6 +7,7 @@ from tinydb import TinyDB, Query
 from tinydb.operations import *
 import datetime
 import requests
+from django.http import JsonResponse
 
 class JsonDb:
 	def __init__(self):
@@ -119,6 +120,12 @@ class EmailTrackr:
 		self.unique_mail_id = unique_mail_id
 		self.comments = comments
 
+
+	def checkPar(self):
+		self.helper = Helpers()
+		self.is_valid,self.err_code = self.helper.verifyEmail(self.sender_email,self.unique_mail_id)
+
+
 	def setTracker(self):
 		self.helper = Helpers()
 		self.is_valid,self.err_code = self.helper.verifyEmail(self.sender_email,self.unique_mail_id)
@@ -136,6 +143,34 @@ class EmailTrackr:
 			return False,self.err_code
 
 
+class headerInfo:
+	def __init__(self,request):
+		self.header = request.headers
+
+	def verifyGoogleCache(self):
+		try:
+			self.user_agent = self.header['User-Agent']
+			if 'GoogleImageProxy' in self.user_agent:
+				return True
+		except Exception as e:
+			print(e)
+			return False
+	
+	def getIp(self):
+		try:
+			self.ip_addr = self.header['X-Forwarded-For']
+			return ip_addr
+		except Exception as e:
+			print(e)
+			try:
+				self.ip_addr = self.header['X-Real-Ip']
+				return ip_addr
+			except Exception as e:
+				print(e)
+				return False
+
+# class telegramMessage:
+# 	def __init__(self,email_id,mail_id,ip_addr)
 
 def index(request):
 	csrf_token = get_token(request)
@@ -153,6 +188,19 @@ def getHeader(request):
 	header_data = request.headers
 	return header_data
 
+
+def checkParam(request):
+	csrf_token = get_token(request)
+	if request.is_ajax():
+		request_data = request.POST
+		print(request_data);
+		sender_email = request_data['email_id'].lower().strip()
+		unique_mail_id = request_data['mail_id'].lower().strip()
+		comments = request_data['comments'].lower().strip()
+		mailTrackr= EmailTrackr(sender_email,unique_mail_id,comments)
+		is_valid,err_code = mailTrackr.setTracker()
+		if err_code == 'receiver_request':
+			return JsonResponse({'something':0})
 
 def getImage(request):
 	csrf_token = get_token(request)

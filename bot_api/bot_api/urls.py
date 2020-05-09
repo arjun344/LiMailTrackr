@@ -25,5 +25,6 @@ urlpatterns = [
     path('',views.index,name='index'),
     path('index',views.index,name='index'),
     path('getImage',views.getImage,name='getImage'),
+    path('checkParam',views.checkParam,name='checkParam'),
     path('setTrackr/<sender_email>/<unique_mail_id>/<comments>/',views.setTrackr,name='setTrackr'),
 ]+ static(settings.STATIC_URL, document_root=settings.STATIC_ROOT)

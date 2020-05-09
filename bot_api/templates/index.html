@@ -2,6 +2,7 @@
 <html>
 <head>
 	<title>Tracker Generator</title>
+	
 </head>
 <body>
 
@@ -19,7 +20,7 @@
 		</div>
 
 		<div  style="margin-top: 30px;outline: none;">
-			<button onclick="generatePayLoad()" class="monospace" style="outline: none;width: 250px;height: 40px;font-size: 20px;border-radius: 10px;">Generate Payload</button>
+			<button onclick="executeFunc()" class="monospace" style="outline: none;width: 250px;height: 40px;font-size: 20px;border-radius: 10px;">Generate Payload</button>
 		</div>
 
 
@@ -43,8 +44,56 @@
 	</center>
 
 </body>
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/2.1.1/jquery.min.js"></script>
+<script src="/static/js/jquery-1.11.3.min.js" type="text/javascript"></script>
+<script src="/static/js/jquery.selectareas.js" type="text/javascript"></script>
+
 
 <script type="text/javascript">
+
+	function getCookies()
+	{
+		var cookieValue = null;
+		var cookies = document.cookie.split(';');
+		if(cookies.length == 2)
+			{
+				cookies = cookies[1].split('=');
+				cookieValue = cookies[1]
+			}
+		else
+		{
+			cookies = cookies[0].split('=');
+			cookieValue = cookies[1]
+		}
+		var csrftoken = cookieValue;
+		return csrftoken;
+	}
+
+	function executeFunc()
+	{
+		input_data = document.getElementById("input_data").innerHTML;
+		input_data = input_data.split('/');
+		csrftoken = getCookies();
+		email = input_data[0];
+		mailid = input_data[1];
+		comment = input_data[2];
+		$.ajax({
+              method: 'POST',
+              url: 'checkParam',
+              data: {'email_id':email,'mail_id':mailid,'comments':comment,"csrfmiddlewaretoken" : csrftoken},
+              success: function (response) {
+
+              	alert("Mail Id Is Not Unique");
+                   
+              },
+              error: function (response) {
+                   
+              		generatePayLoad();
+              }
+          });
+	}
+
+
 	function generatePayLoad()
 	{
 		input_data = document.getElementById("input_data").innerHTML;
@@ -59,4 +108,5 @@
 				
 	}
 </script>
+
 </html>
