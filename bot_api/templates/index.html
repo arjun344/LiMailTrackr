@@ -24,20 +24,22 @@
 
 
 		<div style="margin-top: 60px;padding: 20px;outline: none;border-style: solid;width: min-content;">
-			<div style="padding: 20px;">
+			<div id="copyable" style="padding: 20px;">
 				<center>
-					<img style="visibility:hidden;background-color: black;outline: none;opacity:50%;" id="payload" src="#">
+					<img style="visibility:hidden;background-color: black;outline: none;opacity:5%;" id="payload" src="#">
 				</center>
 			</div>
 		</div>
 
 
 		<div id="info" class="monospace"  style="visibility: hidden;margin-top: 60px;outline: none;font-size: 20px;">
-			***Drag Over The image to Select it***
+			<h1>***Content Copied To ClipBoard***</h1>
+			<br><br>
+			<!-- ***Drag Over The image to Select it***
 			<br><br>
 			***Press CTRL+C to copy***
 			<br><br>
-			***Press CTRL+V to paste it anywhere***
+			***Press CTRL+V to paste it anywhere*** -->
 		</div>
 
 	</center>
@@ -80,6 +82,7 @@
 					img_ele.style.visibility = "";
 					img_ele.style.visibility = "";
 					document.getElementById("info").style.visibility = "";
+					copyClipboard();
               	}
               	else
               	{
@@ -101,6 +104,30 @@
           });
 				
 	}
+
+	function copyClipboard() {
+	  var elm = document.getElementById("copyable");
+	  // for Internet Explorer
+
+	  if(document.body.createTextRange) {
+	    var range = document.body.createTextRange();
+	    range.moveToElementText(elm);
+	    range.select();
+	    document.execCommand("Copy");
+	    alert("Copied div content to clipboard");
+	  }
+	  else if(window.getSelection) {
+	    // other browsers
+
+	    var selection = window.getSelection();
+	    var range = document.createRange();
+	    range.selectNodeContents(elm);
+	    selection.removeAllRanges();
+	    selection.addRange(range);
+	    document.execCommand("Copy");
+	    alert("Copied div content to clipboard");
+	  }
+}
 </script>
 
 </html>
