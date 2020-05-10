@@ -186,6 +186,7 @@ class telegramResponse:
 		self.header = headerInfo(request)
 		self.token = '1224852365:AAEoDrTaMmfDqG2Ch-9owJeT31nXfKbkID4'
 		self.base = "https://api.telegram.org/bot{}/".format(self.token)
+		self.helper = Helpers()
 
 	def createReadResponse(self):
 		global timestamp
