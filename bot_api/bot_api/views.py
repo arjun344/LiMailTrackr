@@ -28,6 +28,22 @@ class JsonDb:
 		else:
 			return False
 
+	def getReadCount(self,sender_email,unique_mail_id):
+		result = self.db.search(self.querier.email == str(sender_email))
+		count = result[0]['mail_unique_id_count'][unique_mail_id]
+		return count
+
+	def getConfigCount(self,sender_email,unique_mail_id):
+		result = self.db.search(self.querier.email == str(sender_email))
+		count = result[0]['config_count'][unique_mail_id]
+		return count
+
+	def updateConfigCount(self,sender_email,unique_mail_id):
+		result = self.db.search(self.querier.email == str(sender_email))
+		config_count = result[0]['config_count']
+		config_count[unique_mail_id] = config_count[unique_mail_id] + 1
+		self.db.update({'config_count':config_count},self.querier.email == str(sender_email))
+
 	def checkUniqueId(self,sender_email,unique_mail_id):
 		result = self.db.search(self.querier.email == str(sender_email))
 		if str(unique_mail_id) in result[0]['mail_unique_id_count'].keys():
@@ -51,6 +67,10 @@ class JsonDb:
 			mail_comments = result[0]['mail_comment']
 			mail_comments[unique_mail_id] = comments
 			self.db.update({'mail_comment':mail_comments},self.querier.email == str(sender_email))
+
+			config_count = result[0]['config_count']
+			config_count[unique_mail_id] = 0
+			self.db.update({'config_count':config_count},self.querier.email == str(sender_email))
 
 			return True
 
@@ -76,11 +96,11 @@ class JsonDb:
 			print(e)
 			return True
 
-	def getLastRead(self,sender_email,unique_mail_id):
+	def getFirstRead(self,sender_email,unique_mail_id):
 		try:
 			result = self.db.search(self.querier.email == str(sender_email))
-			mail_last_read = result[0]['mail_last_read']
-			return mail_last_read[unique_mail_id]
+			mail_last_read = result[0]['mail_last_read'][unique_mail_id]
+			return mail_last_read
 		except Exception as e:
 			print(e)
 
@@ -128,8 +148,6 @@ class Helpers:
 			return True,None
 		else:
 			return True,None
-	def getLastRead(self,sender_email,unique_mail_id):
-		return self.db.getLastRead(sender_email,unique_mail_id)
 
 
 class EmailTrackr:
@@ -198,18 +216,26 @@ class telegramResponse:
 		self.token = '1224852365:AAEoDrTaMmfDqG2Ch-9owJeT31nXfKbkID4'
 		self.base = "https://api.telegram.org/bot{}/".format(self.token)
 		self.helper = Helpers()
+		self.db = JsonDb()
 
 	def createReadResponse(self):
 		global timestamp
 		if self.header.verifyGoogleCache():
-			self.incr,self.err_code =self.helper.updatemailreadCount(self.email_id,self.mail_id)
-			self.body = "Your Mail \n<b>mailid:"+str(self.mail_id)+" \nremark:"+str(self.comment)+"</b>\nWas Read <b>@ "+str(timestamp)+"</b>"
-
+			self.count = self.db.getReadCount(self.email_id,self.mail_id)
+			if self.count == 0:
+				self.incr,self.err_code =self.helper.updatemailreadCount(self.email_id,self.mail_id)
+				self.body = "Your Mail \n<b>mailid:"+str(self.mail_id)+" \nremark:"+str(self.comment)+"</b>\nWas Read <b>@ "+str(timestamp)+"</b>"
+				self.url = self.base + "sendMessage?chat_id={}&text={}&parse_mode=HTML".format(self.sender,self.body)
+				requests.get(self.url,verify=False)
+			else:
+				self.incr,self.err_code =self.helper.updatemailreadCount(self.email_id,self.mail_id)
 		else:
-			self.body = "You have been Configured for \n<b>maild_id:"+str(self.mail_id)+"</b> with \n<b>remark:"+str(self.comment)+"</b>"
-
-		self.url = self.base + "sendMessage?chat_id={}&text={}&parse_mode=HTML".format(self.sender,self.body)
-		requests.get(self.url,verify=False)
+			self.count = self.db.getConfigCount(self.email_id,self.mail_id)
+			if self.count == 0:
+				self.db.updateConfigCount(self.email_id,self.mail_id)
+				self.body = "You have been Configured for \n<b>maild_id:"+str(self.mail_id)+"</b> with \n<b>remark:"+str(self.comment)+"</b>"
+				self.url = self.base + "sendMessage?chat_id={}&text={}&parse_mode=HTML".format(self.sender,self.body)
+				requests.get(self.url,verify=False)
 
 def index(request):
 	csrf_token = get_token(request)
@@ -243,9 +269,6 @@ def setTrackr(request,sender_email,unique_mail_id,comments):
 	is_valid,err_code = mailTrackr.setTracker()
 
 	if err_code == 'receiver_request':
-
-		helper = Helpers()
-		lastread = helper.getLastRead(sender_email,unique_mail_id)
 		response = telegramResponse(request,sender_email,unique_mail_id,comments)
 		response.createReadResponse()
 		httpresponse = HttpResponse()
