@@ -76,6 +76,15 @@ class JsonDb:
 			print(e)
 			return True
 
+	def getLastRead(self,sender_email,unique_mail_id):
+		try:
+			result = self.db.search(self.querier.email == str(sender_email))
+			mail_last_read = result[0]['mail_last_read']
+			return mail_last_read[unique_mail_id]
+		except:
+			print(e)
+
+
 
 class Helpers:
 	def __init__(self,EMAIL_NOT_FOUND_ERROR=401,EMAIL_UNREGISTERED_ERROR=402,MAIL_NOT_UNIQUE_ERROR=403,OTHER_ERRORS=404):
@@ -119,6 +128,8 @@ class Helpers:
 			return True,None
 		else:
 			return True,None
+	def getLastRead(self,sender_email,unique_mail_id):
+		return self.db.getLastRead(sender_email,unique_mail_id)
 
 
 class EmailTrackr:
@@ -162,7 +173,7 @@ class headerInfo:
 		except Exception as e:
 			print(e)
 			return False
-	
+
 	def getIp(self):
 		try:
 			self.ip_addr = self.header['X-Forwarded-For']
@@ -191,13 +202,12 @@ class telegramResponse:
 	def createReadResponse(self):
 		global timestamp
 		if self.header.verifyGoogleCache():
-
 			self.incr,self.err_code =self.helper.updatemailreadCount(self.email_id,self.mail_id)
 			self.body = "Your Mail \n<b>mailid:"+str(self.mail_id)+" \nremark:"+str(self.comment)+"</b>\nWas Read <b>@ "+str(timestamp)+"</b>"
 
 		else:
 			self.body = "You have been Configured for \n<b>maild_id:"+str(self.mail_id)+"</b> with \n<b>remark:"+str(self.comment)+"</b>"
-		
+
 		self.url = self.base + "sendMessage?chat_id={}&text={}&parse_mode=HTML".format(self.sender,self.body)
 		requests.get(self.url,verify=False)
 
@@ -209,12 +219,23 @@ def getImage(request):
 	csrf_token = get_token(request)
 	return render(request,'indexx.html')
 
+def getTimeDifference(current,lastread):
+	# datetime(year, month, day, hour, minute, second) 
+	curr_d = current.split(" ")[0].split("-")
+	curr_t = current.split(" ")[1].split(":")
+
+	las_d = lastread.split(" ")[0].split("-")
+	las_t = lastread.split(" ")[1].split(":")
+	current = datetime.datetime(int(curr_d[0]),int(curr_d[1]),int(curr_d[2]),int(curr_t[0]),int(curr_t[1]),int(curr_t[2]))
+	lastread = datetime.datetime(int(las_d[0]),int(las_d[1]),int(las_d[2]),int(las_t[0]),int(las_t[1]),int(las_t[2]))
+	diff = current-lastread
+	return diff.seconds
+
 def setTrackr(request,sender_email,unique_mail_id,comments):
 	global timestamp
 	timestamp = datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")
 	csrf_token = get_token(request)
 	check = "FromReceiver"
-	print("i am here")
 	sender_email = str(sender_email).lower().strip()
 	unique_mail_id = str(unique_mail_id).strip().lower()
 	comments = str(comments).strip().lower()
@@ -223,14 +244,14 @@ def setTrackr(request,sender_email,unique_mail_id,comments):
 
 	if err_code == 'receiver_request':
 
+		helper = Helpers()
+		lastread = helper.getLastRead(sender_email,unique_mail_id)
 		response = telegramResponse(request,sender_email,unique_mail_id,comments)
 		response.createReadResponse()
-
-		image_data = getImage(request)
-		image_data = open("static/img/test.svg","rb").read()
-		response = HttpResponse()
-		response['status_code'] = 200
-		return response
+		httpresponse = HttpResponse()
+		httpresponse['status_code'] = 200
+		time.sleep(10)
+		return httpresponse
 
 	if is_valid:
 		image_data = getImage(request)
@@ -251,7 +272,6 @@ def setTrackrr(request):
 	if request.is_ajax():
 		request_data = request.POST
 		check = request_data['check']
-		print("i am here 2")
 		sender_email = request_data['emailid'].lower().strip()
 		unique_mail_id = request_data['mailid'].strip().lower()
 		comments = request_data['comments'].strip().lower()

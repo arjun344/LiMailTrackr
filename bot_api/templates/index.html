@@ -14,7 +14,7 @@
 	<center>
 		<div id="input_data" contentEditable="true" class="monospace" style="outline: none;margin-top: 5%;width: 95%;resize: both;height:50px;border-style: solid;border-radius: 50px;font-size:30px;padding-top:25px;font-style: bold;">
 			
-				karjun344@gmail.com/mail123/testing2/
+				karjun344@gmail.com/mail123/testing2
 			
 		</div>
 
@@ -76,8 +76,8 @@
               		input_data = document.getElementById("input_data").innerHTML;
 					generatedSource = host+"/setTrackr/"+input_data.trim();
 					img_ele = document.getElementById("payload");
-					img_ele.style.backgroundImage = 'url('+generatedSource+')';
-					img_ele.src = "#";
+					// img_ele.style.backgroundImage = 'url('+generatedSource+')';
+					img_ele.src = generatedSource;
 					img_ele.style.backgroundColor = "";
 					img_ele.style.visibility = "";
 					img_ele.style.visibility = "";
