@@ -45,7 +45,7 @@ class JsonDb:
 			self.db.update({'mail_unique_id_count':mail_id_dict},self.querier.email == str(sender_email))
 
 			mail_last_dict = result[0]['mail_last_read']
-			mail_last_dict[unique_mail_id] = datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+			mail_last_dict[unique_mail_id] = {}
 			self.db.update({'mail_last_read':mail_last_dict},self.querier.email == str(sender_email))
 
 			mail_comments = result[0]['mail_comment']
@@ -67,7 +67,7 @@ class JsonDb:
 			self.db.update({'mail_unique_id_count':mail_id_dict},self.querier.email == str(sender_email))
 
 			mail_last_dict = result[0]['mail_last_read']
-			mail_last_dict[unique_mail_id] = datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+			mail_last_dict[unique_mail_id][len(mail_last_dict[unique_mail_id])] = datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")
 			self.db.update({'mail_last_read':mail_last_dict},self.querier.email == str(sender_email))
 
 			return True
@@ -81,7 +81,7 @@ class JsonDb:
 			result = self.db.search(self.querier.email == str(sender_email))
 			mail_last_read = result[0]['mail_last_read']
 			return mail_last_read[unique_mail_id]
-		except:
+		except Exception as e:
 			print(e)
 
 
@@ -250,7 +250,6 @@ def setTrackr(request,sender_email,unique_mail_id,comments):
 		response.createReadResponse()
 		httpresponse = HttpResponse()
 		httpresponse['status_code'] = 200
-		time.sleep(10)
 		return httpresponse
 
 	if is_valid:
