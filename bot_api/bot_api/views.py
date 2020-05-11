@@ -233,7 +233,7 @@ class telegramResponse:
 			self.count = self.db.getConfigCount(self.email_id,self.mail_id)
 			if self.count == 0:
 				self.db.updateConfigCount(self.email_id,self.mail_id)
-				self.body = "You have been Configured for \n<b>maild_id:"+str(self.mail_id)+"</b> with \n<b>remark:"+str(self.comment)+"</b>"
+				self.body = "You have been Configured for \n<b>maild_id:"+str(self.mail_id)+"</b> with \n<b>remark:"+str(self.comment)+"</b>\n"
 				self.url = self.base + "sendMessage?chat_id={}&text={}&parse_mode=HTML".format(self.sender,self.body)
 				requests.get(self.url,verify=False)
 
