@@ -23,20 +23,18 @@ class telegram_chatbot():
 class JsonDb:
 	def __init__(self):
 		self.db = TinyDB('bot_api/Database/db.json')
-		self.db2 = TinyDB('bot_api/Database/chat_id_mapping.json')
 		self.querier = Query()
-		self.querier2 = Query()
 		# db.insert({'email': 'karjun344@gmail.com', 'telegram_id': '1234',
 		# 	'mail_unique_id_count':{'mail123':1,'mail124':1},
 		# 	'mail_last_read':{'mail123':'today','mail124':'yesterday'},
 		#	'mail_comment': {'mail123': "testing", 'mail124': "testing2"}})
 
 	def checkUserExists(self,chat_id):
-		result = self.db2.search(self.querier2.chat_id == str(chat_id))
+		result = self.db.search(self.querier.chat_id == str(chat_id))
 		if len(result) == 0:
 			return False,None
 		else:
-			return True,result[0]['user_name']
+			return True,result[0]['email']
 
 	def setUserName(self,username,chat_id):
 		chk,old_username = self.checkUserExists(chat_id)
@@ -44,7 +42,7 @@ class JsonDb:
 			return False,old_username
 		else:
 			try:
-				self.db2.insert({"user_name": username,"chat_id":str(chat_id),"encrypted":str(hash(username))})
+				self.db.insert({"email": username,"chat_id": str(chat_id),"encrypted":str(hash(username)),"mail_unique_id_count": {},"mail_last_read": {},"mail_comment": {},"config_count": {}})
 				return True,username
 			except Exception as e:
 				print(e)

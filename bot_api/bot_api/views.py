@@ -116,7 +116,7 @@ class Helpers:
 
 	def verifyEmail(self,sender_email,unique_mail_id,check):
 		try:
-			self.is_valid = validate_email(sender_email)
+			self.is_valid = True # validate_email(sender_email)
 			if self.is_valid:
 				if self.db.checkMail(sender_email):
 					if self.db.checkUniqueId(sender_email,unique_mail_id):
