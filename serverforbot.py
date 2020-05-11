@@ -58,7 +58,6 @@ def make_reply(msg,sender):
 	db =  JsonDb()
 	user_exist,user_name = db.checkUserExists(sender)
 	if msg is not None:
-
 		sent_user_name = msg.split(":")
 		if len(sent_user_name) >=2:
 			username = ''.join(sent_user_name[1:])
@@ -80,7 +79,6 @@ Click below command to setup your account`
 
 	*/setmeup*
 				'''
-
 		elif msg == '/setmeup':
 			if user_exist:
 				reply = "`Seems you are all set` *"+user_name+"*"
@@ -89,6 +87,9 @@ Click below command to setup your account`
 
 `user:your_username`
 				'''
+
+		else:
+			reply = "`Sorry i am a baby bot,not as smart as you !`"
 
 	return reply
 
