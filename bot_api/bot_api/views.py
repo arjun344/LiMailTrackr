@@ -104,6 +104,15 @@ class JsonDb:
 		except Exception as e:
 			print(e)
 
+	def getUniqueId(self,sender_email):
+		result = self.db.search(self.querier.email == str(sender_email))
+		user_id = result[0]['encrypted']
+		return str(user_id)
+
+	def getUserFromId(self,sender_email):
+		result = self.db.search(self.querier.encrypted == str(sender_email))
+		email = result[0]['email']
+		return str(email)
 
 
 class Helpers:
@@ -265,6 +274,10 @@ def setTrackr(request,sender_email,unique_mail_id,comments):
 	sender_email = str(sender_email).lower().strip()
 	unique_mail_id = str(unique_mail_id).strip().lower()
 	comments = str(comments).strip().lower()
+
+	db = JsonDb()
+	sender_email = db.getUserFromId(sender_email)
+
 	mailTrackr= EmailTrackr(sender_email,unique_mail_id,comments,check)
 	is_valid,err_code = mailTrackr.setTracker()
 
@@ -295,14 +308,27 @@ def setTrackrr(request):
 		request_data = request.POST
 		check = request_data['check']
 		sender_email = request_data['emailid'].lower().strip()
+
+		try:
+			user_id = int(sender_email)
+			return JsonResponse({'validated':'False','errorcode':str(401)})
+		except Exception as e:
+			print(e)
+
+
 		unique_mail_id = request_data['mailid'].strip().lower()
 		comments = request_data['comments'].strip().lower()
 		mailTrackr= EmailTrackr(sender_email,unique_mail_id,comments,check)
 		is_valid,err_code = mailTrackr.setTracker()
+
 		if is_valid:
 			# image_data = getImage(request)
+			db = JsonDb()
+			print("i am here")
+			user_id = db.getUniqueId(sender_email)
+			print(user_id)
 			if check == "FromSender":
-				return JsonResponse({'validated':'True','errorcode':str(err_code)})
+				return JsonResponse({'validated':'True','errorcode':str(err_code),'user_id':str(user_id)})
 			else:
 				return HttpResponse(image_data, content_type="image/png")
 		else:

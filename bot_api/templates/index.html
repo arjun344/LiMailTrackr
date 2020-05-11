@@ -74,7 +74,7 @@
               	if( response['validated']=="True")
               	{
               		input_data = document.getElementById("input_data").innerHTML;
-					generatedSource = host+"/setTrackr/"+input_data.trim();
+					generatedSource = host+"/setTrackr/"+response['user_id']+"/"+mailid+"/"+comments;
 					img_ele = document.getElementById("payload");
 					// img_ele.style.backgroundImage = 'url('+generatedSource+')';
 					img_ele.src = generatedSource;
