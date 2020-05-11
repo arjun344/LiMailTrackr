@@ -64,34 +64,40 @@ def make_reply(msg,sender):
 			result,name = db.setUserName(str(username),sender)
 			if result:
 				reply = "`Hey your username has been set to `*"+name+"*"
+				return reply
 			else:
 				if name != "error":
 					reply = "`Hey seems you already have a name `*"+name+"*"
+					return reply
 				else:
 					reply = "`Hey seems there was a problem try again ! `"
+					return reply
 
 		if msg == '/start':
 			if user_exist:
 				reply = "`Welcome Back !` *"+user_name+"*"
+				return reply
 			else:
 				reply = '''`Let's get you started ! 
 Click below command to setup your account`
 
 	*/setmeup*
 				'''
+				return reply
 		elif msg == '/setmeup':
 			if user_exist:
 				reply = "`Seems you are all set` *"+user_name+"*"
+				return reply
 			else:
 				reply = '''`Send me a cool` *USERNAME* `!` in below format
 
 `user:your_username`
 				'''
+				return reply
 
 		else:
 			reply = "`Sorry i am a baby bot,not as smart as you !`"
-
-	return reply
+			return reply
 
 update_id = None
 while True:
