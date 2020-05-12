@@ -234,8 +234,8 @@ class telegramResponse:
 			self.count = self.db.getReadCount(self.email_id,self.mail_id)
 			# if self.count == 0:
 			self.incr,self.err_code =self.helper.updatemailreadCount(self.email_id,self.mail_id)
-			self.body = "`Your Mail mailid:` "+str(self.mail_id)+" `with remark:` "+str(self.comment)+" `Was interacted just now @` "+str(timestamp)
-			self.url = self.base + "sendMessage?chat_id={}&text={}&parse_mode=MarkdownL".format(self.sender,self.body)
+			self.body = "`Your mail with mailid:` *"+str(self.mail_id)+"*` with remark:` *"+str(self.comment)+"*` Was interacted just now @ ` *"+str(timestamp)+"*"
+			self.url = self.base + "sendMessage?chat_id={}&text={}&parse_mode=Markdown".format(self.sender,self.body)
 			requests.get(self.url,verify=False)
 			
 		else:

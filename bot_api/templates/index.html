@@ -14,12 +14,12 @@
 	<center>
 		<div id="input_data" contentEditable="true" class="monospace" style="outline: none;margin-top: 5%;width: 95%;resize: both;height:50px;border-style: solid;border-radius: 50px;font-size:30px;padding-top:25px;font-style: bold;">
 			
-				karjun344@gmail.com/mail123/testing2
+				user_name/unique_message_id/remarks
 			
 		</div>
 
-		<div  style="margin-top: 30px;outline: none;">
-			<button onclick="generatePayLoad()" class="monospace" style="outline: none;width: 250px;height: 40px;font-size: 20px;border-radius: 10px;">Generate Payload</button>
+		<div style="margin-top: 30px;outline: none;">
+			<button onclick="generatePayLoad()" class="monospace" style="outline: none;width: 250px;height: 40px;font-size: 20px;border-radius: 10px;">Generate Tracker</button>
 		</div>
 
 
@@ -31,6 +31,9 @@
 			</div>
 		</div>
 
+		<div id="copybtn"  style="visibility: hidden;margin-top: 30px;outline: none;">
+			<button onclick="copyClipboard()" class="monospace"  style="outline: none;width: 250px;height: 40px;font-size: 20px;border-radius: 10px;">Copy Tracker</button>
+		</div>
 
 		<div id="info" class="monospace"  style="visibility: hidden;margin-top: 60px;outline: none;font-size: 20px;">
 			<h1>***Content Copied To ClipBoard***</h1>
@@ -81,8 +84,8 @@
 					img_ele.style.backgroundColor = "";
 					img_ele.style.visibility = "";
 					img_ele.style.visibility = "";
-					document.getElementById("info").style.visibility = "";
-					copyClipboard();
+					document.getElementById("copybtn").style.visibility = '';
+					
               	}
               	else
               	{
@@ -91,7 +94,6 @@
 					img_ele.style.backgroundColor = "";
 					img_ele.style.visibility = "";
 					img_ele.style.visibility = "";
-					document.getElementById("info").style.visibility = "";
 
               	}
                    
@@ -114,7 +116,7 @@
 	    range.moveToElementText(elm);
 	    range.select();
 	    document.execCommand("Copy");
-	    alert("Copied div content to clipboard");
+
 	  }
 	  else if(window.getSelection) {
 	    // other browsers
@@ -125,8 +127,9 @@
 	    selection.removeAllRanges();
 	    selection.addRange(range);
 	    document.execCommand("Copy");
-	    alert("Copied div content to clipboard");
 	  }
+
+	  document.getElementById("info").style.visibility = "";
 }
 </script>
 
