@@ -9,6 +9,7 @@ import datetime
 import requests
 from django.http import JsonResponse
 import time
+from django.shortcuts import redirect
 
 
 timestamp = None
@@ -231,19 +232,18 @@ class telegramResponse:
 		global timestamp
 		if self.header.verifyGoogleCache():
 			self.count = self.db.getReadCount(self.email_id,self.mail_id)
-			if self.count == 0:
-				self.incr,self.err_code =self.helper.updatemailreadCount(self.email_id,self.mail_id)
-				self.body = "Your Mail \n<b>mailid:"+str(self.mail_id)+" \nremark:"+str(self.comment)+"</b>\nWas Read <b>@ "+str(timestamp)+"</b>"
-				self.url = self.base + "sendMessage?chat_id={}&text={}&parse_mode=HTML".format(self.sender,self.body)
-				requests.get(self.url,verify=False)
-			else:
-				self.incr,self.err_code =self.helper.updatemailreadCount(self.email_id,self.mail_id)
+			# if self.count == 0:
+			self.incr,self.err_code =self.helper.updatemailreadCount(self.email_id,self.mail_id)
+			self.body = "`Your Mail mailid:` "+str(self.mail_id)+" `with remark:` "+str(self.comment)+" `Was interacted just now @` "+str(timestamp)
+			self.url = self.base + "sendMessage?chat_id={}&text={}&parse_mode=MarkdownL".format(self.sender,self.body)
+			requests.get(self.url,verify=False)
+			
 		else:
 			self.count = self.db.getConfigCount(self.email_id,self.mail_id)
 			if self.count == 0:
 				self.db.updateConfigCount(self.email_id,self.mail_id)
-				self.body = "You have been Configured for \n<b>maild_id:"+str(self.mail_id)+"</b> with \n<b>remark:"+str(self.comment)+"</b>\n"
-				self.url = self.base + "sendMessage?chat_id={}&text={}&parse_mode=HTML".format(self.sender,self.body)
+				self.body = "`You have been Configured for maild_id:` "+str(self.mail_id)+" `with remark:` "+str(self.comment)
+				self.url = self.base + "sendMessage?chat_id={}&text={}&parse_mode=Markdown".format(self.sender,self.body)
 				requests.get(self.url,verify=False)
 
 def index(request):
@@ -286,8 +286,8 @@ def setTrackr(request,sender_email,unique_mail_id,comments):
 		response.createReadResponse()
 		httpresponse = HttpResponse()
 		httpresponse['status_code'] = 200
+		image_data = open("static/img/1px-1px.png","rb").read()
 		return httpresponse
-
 	if is_valid:
 		image_data = getImage(request)
 		if check == "FromSender":

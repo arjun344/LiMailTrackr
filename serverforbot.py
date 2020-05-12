@@ -58,18 +58,25 @@ def make_reply(msg,sender):
 	if msg is not None:
 		sent_user_name = msg.split(":")
 		if len(sent_user_name) >=2:
-			username = ''.join(sent_user_name[1:])
-			result,name = db.setUserName(str(username),sender)
-			if result:
-				reply = "`Hey your username has been set to `*"+name+"*"
-				return reply
-			else:
-				if name != "error":
-					reply = "`Hey seems you already have a name `*"+name+"*"
+			if sent_user_name[0].lower().strip() == "user":
+				username = ''.join(sent_user_name[1:]).strip()
+				result,name = db.setUserName(str(username),sender)
+				if result:
+					reply = "`Hey your username has been set to `*"+name+"*"
+					reply = reply + '''
+`visit` arjun344.pythonanywhere.com `to generate your tracker`
+					'''
 					return reply
 				else:
-					reply = "`Hey seems there was a problem try again ! `"
-					return reply
+					if name != "error":
+						reply = "`Hey seems you already have a name `*"+name+"*"
+						reply = reply + '''
+`visit` arjun344.pythonanywhere.com `to generate your tracker`
+					'''
+						return reply
+					else:
+						reply = "`Hey seems there was a problem try again ! `"
+						return reply
 
 		if msg == '/start':
 			if user_exist:
@@ -94,7 +101,7 @@ Click below command to setup your account`
 				return reply
 
 		else:
-			reply = "`Sorry i am a baby bot,not as smart as you !`"
+			reply = "`command not recognized ! Sorry i am a baby bot,not as smart as you !`"
 			return reply
 
 update_id = None
