@@ -48,6 +48,14 @@ class JsonDb:
 				print(e)
 				return False,"error"
 
+	def deleteDb(self):
+		self.db.truncate()
+
+	def getData(self):
+		return self.db.all()
+
+
+
 bot = telegram_chatbot()
 
 
@@ -56,6 +64,15 @@ def make_reply(msg,sender):
 	db =  JsonDb()
 	user_exist,user_name = db.checkUserExists(sender)
 	if msg is not None:
+		if msg =='/empty':
+			reply = "`Truncated the database ! `"
+			db.deleteDb()
+			return reply
+
+		if msg == '/get':
+			reply = '''`'''+str(db.getData())+'''`'''
+			return reply
+
 		sent_user_name = msg.split(":")
 		if len(sent_user_name) >=2:
 			if sent_user_name[0].lower().strip() == "user":

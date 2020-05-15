@@ -2,6 +2,13 @@
 <html>
 <head>
 	<title>Tracker Generator</title>
+	<link href="//maxcdn.bootstrapcdn.com/bootstrap/3.3.0/css/bootstrap.min.css" rel="stylesheet" id="bootstrap-css">
+<script src="//maxcdn.bootstrapcdn.com/bootstrap/3.3.0/js/bootstrap.min.js"></script>
+<script src="//code.jquery.com/jquery-1.11.1.min.js"></script>
+<!------ Include the above in your HEAD tag ---------->
+
+
+<link href="//maxcdn.bootstrapcdn.com/font-awesome/4.2.0/css/font-awesome.min.css" rel="stylesheet">
 </head>
 <body>
 
@@ -9,24 +16,33 @@
 		.monospace {
 			  font-family: "Lucida Console", Courier, monospace;
 			}
+			[contenteditable=true]:empty:before{
+			  content: attr(placeholder);
+			  pointer-events: none;
+			  display: block; /* For Firefox */
+			  opacity: 50%;
+			}
+
+			div[contenteditable=true] {
+			  border: 1px dashed #AAA;
+			  width: 290px;
+			  padding: 5px;
+			}
 	</style>
 
 	<center>
-		<div id="input_data" contentEditable="true" class="monospace" style="outline: none;margin-top: 5%;width: 95%;resize: both;height:50px;border-style: solid;border-radius: 50px;font-size:30px;padding-top:25px;font-style: bold;">
-			
-				user_name/unique_message_id/remarks
-			
-		</div>
+		<div id="input_data" placeholder="user_name/unique_message_id/remarks" contentEditable="true" class="monospace" style="outline: none;margin-top: 5%;width: 95%;resize: both;height:100px;border-style: solid;border-radius: 50px;font-size:30px;padding-top:25px;font-style: bold;"></div>
 
 		<div style="margin-top: 30px;outline: none;">
-			<button onclick="generatePayLoad()" class="monospace" style="outline: none;width: 250px;height: 40px;font-size: 20px;border-radius: 10px;">Generate Tracker</button>
+			<button id="generatep" onclick="generatePayLoad()" class="monospace" style="outline: none;width: 250px;height: 40px;font-size: 20px;border-radius: 10px;">Generate Tracker</button>
 		</div>
 
 
-		<div style="margin-top: 60px;padding: 20px;outline: none;border-style: solid;width: min-content;">
+		<div>
 			<div id="copyable" style="padding: 20px;">
 				<center>
-					<img style="visibility:hidden;background-color: black;outline: none;opacity:5%;" id="payload" src="#">
+					<img style="visibility:hidden;background-color: black;outline: none;" id="payload" src="http://arjun344.pythonanywhere.com/static/img/1px-1px.png?r=1253">
+					arjun
 				</center>
 			</div>
 		</div>
@@ -56,6 +72,10 @@
 
 	function generatePayLoad()
 	{
+		var btn = document.getElementById('generatep')
+		var loading = '<i class="fa fa-spinner fa-spin"></i> Loading..'
+		btn.innerHTML = loading;
+
 		var host = "http://"+location.hostname;
 		if(location.hostname == "localhost")
 		{
@@ -77,14 +97,18 @@
               	if( response['validated']=="True")
               	{
               		input_data = document.getElementById("input_data").innerHTML;
-					generatedSource = host+"/setTrackr/"+response['user_id']+"/"+mailid+"/"+comments;
+					// generatedSource = host+"/setTrackr/"+response['user_id']+"/"+mailid+"/"+comments;
+					alert(response['user_id']);
 					img_ele = document.getElementById("payload");
+					var src = 'http://arjun344.pythonanywhere.com/static/img/1px-1px.png?r=1253'
+					img_ele.src = src;
 					// img_ele.style.backgroundImage = 'url('+generatedSource+')';
-					img_ele.src = generatedSource;
 					img_ele.style.backgroundColor = "";
 					img_ele.style.visibility = "";
 					img_ele.style.visibility = "";
 					document.getElementById("copybtn").style.visibility = '';
+					btn.innerHTML = 'Generate Tracker';
+
 					
               	}
               	else
@@ -94,13 +118,14 @@
 					img_ele.style.backgroundColor = "";
 					img_ele.style.visibility = "";
 					img_ele.style.visibility = "";
-
+					btn.innerHTML = 'Generate Tracker';
               	}
                    
               },
               error: function (response) {
                    
               		alert("Something Went Wrong");
+              		btn.innerHTML = 'Generate Tracker';
 
               }
           });

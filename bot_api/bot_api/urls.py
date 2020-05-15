@@ -24,7 +24,6 @@ from django.conf.urls import handler404, handler500
 urlpatterns = [
     path('',views.index,name='index'),
     path('index',views.index,name='index'),
-    path('getImage',views.getImage,name='getImage'),
-    path('setTrackrr',views.setTrackrr,name='setTrackrr'),
-    path('setTrackr/<sender_email>/<unique_mail_id>/<comments>/',views.setTrackr,name='setTrackr'),
+    path('setTrackrr',views.setTrackrr,name='setTrackrr')
+    # path('setTrackr/<sender_email>/<unique_mail_id>/<comments>/',views.setTrackr,name='setTrackr'),
 ]+ static(settings.STATIC_URL, document_root=settings.STATIC_ROOT)
