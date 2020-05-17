@@ -11,8 +11,6 @@ from .database import JsonDb
 from .telegramResponse import telegramResponse
 from .helper import Helpers
 
-timestamp = datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")
-
 
 def index(request):
 	csrf_token = get_token(request)
@@ -20,6 +18,7 @@ def index(request):
 
 def getTimeDifference(current,lastread):
 	# datetime(year, month, day, hour, minute, second) 
+	print(current,lastread)
 	curr_d = current.split(" ")[0].split("-")
 	curr_t = current.split(" ")[1].split(":")
 	las_d = lastread.split(" ")[0].split("-")
@@ -30,7 +29,7 @@ def getTimeDifference(current,lastread):
 	return diff.seconds
 
 def setTrackr(request,sender_email,unique_mail_id,comments):
-	global timestamp
+	timestamp = datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")
 	db = JsonDb()
 	helpers = Helpers(db,request,sender_email,unique_mail_id,comments)
 	sender_email = db.getUserFromId(sender_email)
@@ -40,11 +39,18 @@ def setTrackr(request,sender_email,unique_mail_id,comments):
 		return JsonResponse({'errorcode':'Hey This Seems its invalid url !'})
 
 	if count != None:
+		count = int(count)
 		if count > 1:
 			fromGoogle = helpers.verifyGoogleCache()
 			if fromGoogle:
 				lastread = db.getLastRead(sender_email,unique_mail_id)
-				diff = int(getTimeDifference(timestamp,lastread))
+				if lastread == None:
+					diff = 100
+				else:
+					diff = getTimeDifference(timestamp,lastread)
+
+				print(diff)
+
 				if diff >= 5:
 					status = db.updateMailReadCount(sender_email,unique_mail_id)
 					if status:
@@ -61,15 +67,15 @@ def setTrackr(request,sender_email,unique_mail_id,comments):
 			else:
 				return JsonResponse({'status':'Hey this url is not meant to be accesed from outside !'})
 
-	elif count == 1:
-		db.updateConfigCount(sender_email,unique_mail_id)
-		return JsonResponse({'status':'imageGenerated'})
+		elif count == 1:
+			db.updateConfigCount(sender_email,unique_mail_id)
+			return JsonResponse({'status':'imageGenerated'})
 
 
 	return JsonResponse({'errorcode':'Sorry Action Not Allowed'})
 
 def setTrackrr(request):
-	global timestamp
+	timestamp = datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")
 	csrf_token = get_token(request)
 	if request.is_ajax():
 		request_data = request.POST

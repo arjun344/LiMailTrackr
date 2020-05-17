@@ -53,7 +53,7 @@ class JsonDb:
 			self.db.update({'mail_unique_id_count':mail_id_dict},self.querier.email == str(sender_email))
 
 			mail_last_dict = result[0]['mail_last_read']
-			mail_last_dict[unique_mail_id] = {0:'0-0-0 0:0:0'}
+			mail_last_dict[unique_mail_id] = {}
 			self.db.update({'mail_last_read':mail_last_dict},self.querier.email == str(sender_email))
 
 			mail_comments = result[0]['mail_comment']
@@ -94,9 +94,10 @@ class JsonDb:
 		try:
 			result = self.db.search(self.querier.email == str(sender_email))
 			mail_last_read = result[0]['mail_last_read'][unique_mail_id]
-			return mail_last_read[len(mail_last_read)-1]
+			return mail_last_read[str(len(mail_last_read)-1)]
 		except Exception as e:
 			print(e)
+			return None
 
 	def getUniqueId(self,sender_email):
 		result = self.db.search(self.querier.email == str(sender_email))

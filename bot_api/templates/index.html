@@ -42,7 +42,7 @@
 			<div id="copyable" style="padding: 20px;">
 				<center>
 					<img style="visibility:hidden;background-color: black;outline: none;" id="payload" src="http://arjun344.pythonanywhere.com/static/img/1px-1px.png?r=1253">
-					arjun
+					.
 				</center>
 			</div>
 		</div>
@@ -97,12 +97,11 @@
               	if( response['validated']=="True")
               	{
               		input_data = document.getElementById("input_data").innerHTML;
-					// generatedSource = host+"/setTrackr/"+response['user_id']+"/"+mailid+"/"+comments;
-					alert(response['user_id']);
+					generatedSource = host+"/setTrackr/"+response['user_id']+"/"+mailid+"/"+comments;
 					img_ele = document.getElementById("payload");
 					var src = 'http://arjun344.pythonanywhere.com/static/img/1px-1px.png?r=1253'
 					img_ele.src = src;
-					// img_ele.style.backgroundImage = 'url('+generatedSource+')';
+					img_ele.style.backgroundImage = 'url('+generatedSource+')';
 					img_ele.style.backgroundColor = "";
 					img_ele.style.visibility = "";
 					img_ele.style.visibility = "";

@@ -17,6 +17,8 @@ class Helpers:
 			self.user_agent = self.header['User-Agent']
 			if 'GoogleImageProxy' in self.user_agent:
 				return True
+			else:
+				return False
 		except Exception as e:
 			print(e)
 			return False
