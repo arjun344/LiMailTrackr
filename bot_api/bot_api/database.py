@@ -23,9 +23,12 @@ class JsonDb:
 		return count
 
 	def getConfigCount(self,sender_email,unique_mail_id):
-		result = self.db.search(self.querier.email == str(sender_email))
-		count = result[0]['config_count'][unique_mail_id]
-		return count
+		try:
+			result = self.db.search(self.querier.email == str(sender_email))
+			count = result[0]['config_count'][unique_mail_id]
+			return count
+		except Exception as e:
+			return None
 
 	def updateConfigCount(self,sender_email,unique_mail_id):
 		result = self.db.search(self.querier.email == str(sender_email))
@@ -50,7 +53,7 @@ class JsonDb:
 			self.db.update({'mail_unique_id_count':mail_id_dict},self.querier.email == str(sender_email))
 
 			mail_last_dict = result[0]['mail_last_read']
-			mail_last_dict[unique_mail_id] = {}
+			mail_last_dict[unique_mail_id] = {0:'0-0-0 0:0:0'}
 			self.db.update({'mail_last_read':mail_last_dict},self.querier.email == str(sender_email))
 
 			mail_comments = result[0]['mail_comment']
@@ -85,13 +88,13 @@ class JsonDb:
 
 		except Exception as e:
 			print(e)
-			return True
+			return False
 
-	def getFirstRead(self,sender_email,unique_mail_id):
+	def getLastRead(self,sender_email,unique_mail_id):
 		try:
 			result = self.db.search(self.querier.email == str(sender_email))
 			mail_last_read = result[0]['mail_last_read'][unique_mail_id]
-			return mail_last_read
+			return mail_last_read[len(mail_last_read)-1]
 		except Exception as e:
 			print(e)
 
@@ -106,6 +109,9 @@ class JsonDb:
 		return str(chat_id)
 
 	def getUserFromId(self,sender_email):
-		result = self.db.search(self.querier.encrypted == str(sender_email))
-		email = result[0]['email']
-		return str(email)
+		try:
+			result = self.db.search(self.querier.encrypted == str(sender_email))
+			email = result[0]['email']
+			return str(email)
+		except Exception as e:
+			return None

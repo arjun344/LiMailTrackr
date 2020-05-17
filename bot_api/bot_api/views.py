@@ -29,42 +29,44 @@ def getTimeDifference(current,lastread):
 	diff = current-lastread
 	return diff.seconds
 
-# def setTrackr(request,sender_email,unique_mail_id,comments):
-# 	global timestamp
-# 	timestamp = datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")
-# 	csrf_token = get_token(request)
-# 	check = "FromReceiver"
-# 	sender_email = str(sender_email).lower().strip()
-# 	unique_mail_id = str(unique_mail_id).strip().lower()
-# 	comments = str(comments).strip().lower()
-# 	db = JsonDb()
-# 	sender_email = db.getUserFromId(sender_email)
-# 	print(sender_email)
-# 	mailTrackr= EmailTrackr(sender_email,unique_mail_id,comments,check)
-# 	is_valid,err_code = mailTrackr.setTracker()
+def setTrackr(request,sender_email,unique_mail_id,comments):
+	global timestamp
+	db = JsonDb()
+	helpers = Helpers(db,request,sender_email,unique_mail_id,comments)
+	sender_email = db.getUserFromId(sender_email)
+	count = db.getConfigCount(sender_email,unique_mail_id)
 
-# 	print(is_valid,err_code)
+	if sender_email == None or count==None:
+		return JsonResponse({'errorcode':'Hey This Seems its invalid url !'})
 
-# 	if err_code == 'receiver_request':
-# 		response = telegramResponse(request,sender_email,unique_mail_id,comments)
-# 		response.createReadResponse()
-# 		httpresponse = HttpResponse()
-# 		httpresponse['status_code'] = 200
-# 		return httpresponse
+	if count != None:
+		if count > 1:
+			fromGoogle = helpers.verifyGoogleCache()
+			if fromGoogle:
+				lastread = db.getLastRead(sender_email,unique_mail_id)
+				diff = int(getTimeDifference(timestamp,lastread))
+				if diff >= 5:
+					status = db.updateMailReadCount(sender_email,unique_mail_id)
+					if status:
+						chat_id = db.getChatId(sender_email)
+						tResponse = telegramResponse(request,sender_email,unique_mail_id,comments,chat_id,timestamp)
+						tResponse.sendReadResponse()
+						return JsonResponse({'status':'request logged as mail read'})
+					else:
+						return JsonResponse({'status':'something went wrong'})
 
-# 	if is_valid:
-# 		image_data = getImage(request)
-# 		if check == "FromSender":
-# 			return JsonResponse({'validated':'True','errorcode':str(err_code)})
-# 		else:
-# 			return HttpResponse(image_data, content_type="image/png")
-# 	else:
-# 		if check == "FromSender":
-# 			return JsonResponse({'validated':'False','errorcode':str(err_code)})
-# 		else:
-# 			image_data = open("static/img/"+str(err_code)+".PNG","rb").read()
+				else:
+					return JsonResponse({'status':'TIME_DIFF_LESS_THAN_5'})
 
-# 	return HttpResponse(image_data, content_type="image/png")
+			else:
+				return JsonResponse({'status':'Hey this url is not meant to be accesed from outside !'})
+
+	elif count == 1:
+		db.updateConfigCount(sender_email,unique_mail_id)
+		return JsonResponse({'status':'imageGenerated'})
+
+
+	return JsonResponse({'errorcode':'Sorry Action Not Allowed'})
 
 def setTrackrr(request):
 	global timestamp

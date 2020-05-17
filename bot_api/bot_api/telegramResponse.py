@@ -34,3 +34,8 @@ class telegramResponse:
 		self.body = "`You have been Configured for maild_id:` "+str(self.mail_id)+" `with remark:` "+str(self.comment)
 		self.url = self.base + "sendMessage?chat_id={}&text={}&parse_mode=Markdown".format(self.chat_id,self.body)
 		requests.get(self.url,verify=False)
+
+	def sendReadResponse(self):
+		self.body = "`Your mail with mailid:` *"+str(self.mail_id)+"*` with remark:` *"+str(self.comment)+"*` Was interacted just now @ ` *"+str(timestamp)+"*"
+		self.url = self.base + "sendMessage?chat_id={}&text={}&parse_mode=Markdown".format(self.sender,self.body)
+		requests.get(self.url,verify=False)
