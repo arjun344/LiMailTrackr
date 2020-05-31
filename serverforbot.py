@@ -5,7 +5,7 @@ from tinydb.operations import *
 
 class telegram_chatbot():
 	def __init__(self):
-		self.token = '1224852365:AAEoDrTaMmfDqG2Ch-9owJeT31nXfKbkID4'
+		self.token = 'your_token'
 		self.base = "https://api.telegram.org/bot{}/".format(self.token)
 
 	def get_updates(self,offset=None):
