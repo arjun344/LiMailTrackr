@@ -11,7 +11,7 @@ I am very easy to setUp ***no installation required***.
 You just need to have Telegram to receive realtime notifications.
 
 - Open Your Telegram and just search for **`@MailTrackerBot`**.
-- Once you are find it just open it and click on **`START`**.
+- Once you find it just open it and click on **`START`**.
 - Just follow the steps the bot provides you.
 
 Once setup your account with us just visit   [the tracker generator](http://arjun344.pythonanywhere.com/) .
