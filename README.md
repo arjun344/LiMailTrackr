@@ -23,5 +23,4 @@ Once setup your account with us just visit   [the tracker generator](http://arju
 **UNIQUE_MSG_ID** any unique name that can identify your mail.<br>
 **REMARK** a comment for the mail , will be easy for you to guess the mail when you are notified
 
-***Hey ! <br>
-this is under development right now so don't go hard on it , I am facing some issues right now so if you wan't to help mail me @ `karjun344@gmail.com`***
+***Hey !  this is under development right now so don't go hard on it , I am facing some issues right now so if you wan't to help mail me @ `karjun344@gmail.com`***
