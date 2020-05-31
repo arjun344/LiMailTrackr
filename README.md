@@ -23,4 +23,7 @@ Once you are done with setup just visit   [the tracker generator](http://arjun34
 **UNIQUE_MSG_ID** any unique name that can identify your mail.<br>
 **REMARK** a comment for the mail , will be easy for you to guess the mail when you are notified
 
+Once the tracker is generated just copy it and paste it at the very end of the mail you want to track and just send it.
+
+
 ***Hey !  this is under development right now so don't go hard on it , I am facing some issues so if you want to help just mail me @ `karjun344@gmail.com`***
