@@ -8,7 +8,7 @@ class telegramResponse:
 		self.comment = comment
 		self.chat_id = chat_id
 		self.header = request.headers
-		self.token = '1224852365:AAEoDrTaMmfDqG2Ch-9owJeT31nXfKbkID4'
+		self.token = 'your_token'
 		self.base = "https://api.telegram.org/bot{}/".format(self.token)
 		self.timestamp = timestamp
 
