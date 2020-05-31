@@ -14,7 +14,7 @@ You just need to have Telegram to receive realtime notifications.
 - Once you find it just open it and click on **`START`**.
 - Just follow the steps the bot provides you.
 
-Once setup your account with us just visit   [the tracker generator](http://arjun344.pythonanywhere.com/) .
+Once you are done with setup just visit   [the tracker generator](http://arjun344.pythonanywhere.com/) .
 
 **Make Sure You Put Your Information In the Format Shown Below :**
 - `USERNAME / UNIQUE_MSG_ID / REMARK`
